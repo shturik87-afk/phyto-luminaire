@@ -1,0 +1,1374 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>🌿 Фитосветильник</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+    :root {
+      --phase-seed: #9c27b0;
+      --phase-veg: #4caf50;
+      --phase-flow: #ff9800;
+      --phase-fru: #f44336;
+      --bg: #f5f7fa;
+      --card: #ffffff;
+      --header: #2e7d32;
+      --auto: #2196f3;
+      --manual: #9e9e9e;
+      --master: #6a1b9a;
+      --slave: #3f51b5;
+      --warning: #ff5722;
+      --success: #4caf50;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: var(--bg);
+      color: #333;
+      padding: 12px;
+      max-width: 500px;
+      margin: 0 auto;
+      user-select: none;
+    }
+    
+    .header {
+      background: var(--header);
+      color: white;
+      padding: 20px 16px;
+      border-radius: 20px;
+      text-align: center;
+      margin-bottom: 16px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+      position: relative;
+    }
+    
+    .header-badge {
+      position: absolute;
+      top: 8px;
+      right: 12px;
+      background: rgba(255,255,255,0.3);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    
+    .header-badge.master { background: var(--master); }
+    .header-badge.slave { background: var(--slave); }
+    
+    .title {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    
+    .time {
+      font-size: 48px;
+      font-weight: 800;
+      margin: 12px 0;
+      font-variant-numeric: tabular-nums;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    
+    .phase-badge {
+      background: rgba(255,255,255,0.25);
+      padding: 8px 20px;
+      border-radius: 24px;
+      font-size: 18px;
+      font-weight: 600;
+      display: inline-block;
+      margin-top: 8px;
+      backdrop-filter: blur(10px);
+    }
+    
+    .card {
+      background: var(--card);
+      padding: 18px;
+      border-radius: 20px;
+      margin-bottom: 16px;
+      box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+      transition: transform 0.1s ease;
+    }
+    
+    .card:active {
+      transform: scale(0.99);
+    }
+    
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #eee;
+    }
+    
+    .card-title {
+      font-size: 17px;
+      font-weight: 700;
+      color: #2e7d32;
+    }
+    
+    .card-subtitle {
+      font-size: 14px;
+      color: #757575;
+      margin-top: 4px;
+      line-height: 1.4;
+    }
+    
+    .mode-switch {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin: 16px 0;
+    }
+    
+    .mode-btn {
+      padding: 16px;
+      border: none;
+      border-radius: 16px;
+      font-size: 16px;
+      font-weight: 700;
+      color: white;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .mode-btn:active {
+      transform: scale(0.96);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+    }
+    
+    .mode-auto { background: var(--auto); }
+    .mode-manual { background: var(--manual); }
+    .mode-master { background: var(--master); }
+    .mode-slave { background: var(--slave); }
+    
+    .mode-active {
+      transform: scale(1.03);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+    }
+    
+    .phase-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    
+    .phase-btn {
+      padding: 18px 12px;
+      border: none;
+      border-radius: 16px;
+      font-size: 15px;
+      font-weight: 700;
+      color: white;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s ease;
+      line-height: 1.3;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .phase-btn:active {
+      transform: scale(0.97);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+    }
+    
+    .phase-seed { background: var(--phase-seed); }
+    .phase-veg { background: var(--phase-veg); }
+    .phase-flow { background: var(--phase-flow); }
+    .phase-fru { background: var(--phase-fru); }
+    
+    .phase-active {
+      box-shadow: 0 0 0 4px rgba(255,255,255,0.6), 0 4px 16px rgba(0,0,0,0.2);
+      transform: scale(1.01);
+    }
+    
+    .slider-group {
+      margin: 16px 0;
+    }
+    
+    .slider-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      font-size: 15px;
+      font-weight: 600;
+    }
+    
+    .slider-value {
+      background: #e8f5e9;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-weight: 700;
+      min-width: 40px;
+      text-align: center;
+    }
+    
+    .slider {
+      width: 100%;
+      height: 48px;
+      -webkit-appearance: none;
+      background: #e0e0e0;
+      border-radius: 24px;
+      outline: none;
+      margin: 8px 0;
+      transition: height 0.2s;
+    }
+    
+    .slider:active {
+      height: 52px;
+    }
+    
+    .slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--header);
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+    
+    .slider::-webkit-slider-thumb:active {
+      transform: scale(1.15);
+      box-shadow: 0 3px 12px rgba(0,0,0,0.3);
+    }
+    
+    .status-bar {
+      height: 10px;
+      background: #e0e0e0;
+      border-radius: 5px;
+      margin: 16px 0;
+      overflow: hidden;
+      position: relative;
+    }
+    
+    .status-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #4caf50 0%, #8bc34a 100%);
+      border-radius: 5px;
+      transition: width 0.8s ease;
+      position: relative;
+    }
+    
+    .status-label {
+      position: absolute;
+      top: -22px;
+      right: 8px;
+      font-size: 11px;
+      font-weight: 600;
+      color: #666;
+      background: white;
+      padding: 2px 6px;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    
+    .input-group {
+      margin: 14px 0;
+    }
+    
+    .input-label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      font-size: 15px;
+      color: #424242;
+    }
+    
+    .input-field {
+      width: 100%;
+      padding: 14px;
+      border: 2px solid #e0e0e0;
+      border-radius: 16px;
+      font-size: 16px;
+      background: #fafafa;
+      transition: border-color 0.3s;
+    }
+    
+    .input-field:focus {
+      outline: none;
+      border-color: var(--header);
+      background: white;
+    }
+    
+    .btn {
+      width: 100%;
+      padding: 16px;
+      border: none;
+      border-radius: 16px;
+      font-size: 17px;
+      font-weight: 700;
+      color: white;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      margin-top: 10px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+    }
+    
+    .btn:active {
+      transform: scale(0.97);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
+    
+    .btn-primary { background: var(--header); }
+    .btn-warning { background: var(--warning); }
+    .btn-success { background: var(--success); }
+    .btn-outline {
+      background: transparent;
+      border: 2px solid var(--header);
+      color: var(--header);
+    }
+    
+    .btn-outline:active {
+      background: rgba(46, 125, 50, 0.08);
+    }
+    
+    .switch-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 0;
+    }
+    
+    .switch-label {
+      font-size: 16px;
+      font-weight: 600;
+    }
+    
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 52px;
+      height: 30px;
+    }
+    
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    
+    .slider-switch {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: .3s;
+      border-radius: 30px;
+    }
+    
+    .slider-switch:before {
+      position: absolute;
+      content: "";
+      height: 24px;
+      width: 24px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .3s;
+      border-radius: 50%;
+    }
+    
+    input:checked + .slider-switch {
+      background-color: var(--header);
+    }
+    
+    input:checked + .slider-switch:before {
+      transform: translateX(22px);
+    }
+    
+    .device-list {
+      max-height: 200px;
+      overflow-y: auto;
+      margin-top: 12px;
+      padding-right: 8px;
+    }
+    
+    .device-item {
+      display: flex;
+      align-items: center;
+      padding: 12px;
+      background: #f9f9f9;
+      border-radius: 12px;
+      margin-bottom: 8px;
+      transition: all 0.2s;
+    }
+    
+    .device-item:active {
+      background: #e8f5e9;
+      transform: scale(0.99);
+    }
+    
+    .device-color {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      margin-right: 12px;
+    }
+    
+    .device-info {
+      flex: 1;
+    }
+    
+    .device-name {
+      font-weight: 600;
+      font-size: 15px;
+    }
+    
+    .device-ip {
+      font-size: 13px;
+      color: #757575;
+    }
+    
+    .device-badge {
+      background: var(--master);
+      color: white;
+      padding: 3px 8px;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    
+    .device-badge.slave { background: var(--slave); }
+    
+    .tabs {
+      display: flex;
+      margin-bottom: 16px;
+      border-bottom: 2px solid #e0e0e0;
+    }
+    
+    .tab {
+      flex: 1;
+      padding: 14px 8px;
+      text-align: center;
+      font-size: 16px;
+      font-weight: 600;
+      color: #757575;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+    }
+    
+    .tab.active {
+      color: var(--header);
+      font-weight: 700;
+    }
+    
+    .tab.active:after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--header);
+      border-radius: 3px 3px 0 0;
+    }
+    
+    .tab-content {
+      display: none;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+    
+    .feedback {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      background: rgba(0,0,0,0.92);
+      color: white;
+      padding: 16px 28px;
+      border-radius: 24px;
+      font-size: 18px;
+      font-weight: 700;
+      z-index: 10000;
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      text-align: center;
+      max-width: 85%;
+      line-height: 1.4;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+      pointer-events: none;
+    }
+    
+    .feedback.show {
+      transform: translate(-50%, -50%) scale(1);
+      opacity: 1;
+    }
+    
+    .debug-panel {
+      background: #fff3e0;
+      padding: 12px;
+      border-radius: 12px;
+      margin-top: 12px;
+      font-family: monospace;
+      font-size: 11px;
+      max-height: 150px;
+      overflow-y: auto;
+      border: 1px solid #ffe0b2;
+    }
+    
+    .debug-entry {
+      padding: 4px 0;
+      border-bottom: 1px solid #ffd54f;
+      font-size: 12px;
+    }
+    
+    .debug-time {
+      color: #5d4037;
+      font-weight: 600;
+      margin-right: 8px;
+    }
+    
+    .debug-msg {
+      color: #e65100;
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 24px 16px;
+      color: #757575;
+      font-size: 15px;
+      line-height: 1.5;
+    }
+    
+    .empty-icon {
+      font-size: 48px;
+      margin-bottom: 12px;
+      opacity: 0.6;
+    }
+    
+    /* Скрыть скроллбар для красивого вида */
+    ::-webkit-scrollbar {
+      display: none;
+    }
+    
+    /* Анимации */
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+    
+    .pulse {
+      animation: pulse 2s infinite;
+    }
+    
+    .fade-in {
+      animation: fadeIn 0.4s ease forwards;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    /* Модальное окно */
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    
+    .modal.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+    
+    .modal-content {
+      background: white;
+      border-radius: 24px;
+      width: 92%;
+      max-width: 480px;
+      max-height: 90vh;
+      overflow-y: auto;
+      transform: scale(0.95);
+      transition: transform 0.3s ease;
+    }
+    
+    .modal.active .modal-content {
+      transform: scale(1);
+    }
+    
+    .modal-header {
+      padding: 20px;
+      text-align: center;
+      border-bottom: 1px solid #eee;
+    }
+    
+    .modal-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--header);
+    }
+    
+    .modal-body {
+      padding: 20px;
+    }
+    
+    .modal-footer {
+      padding: 16px 20px;
+      border-top: 1px solid #eee;
+      display: flex;
+      gap: 12px;
+    }
+    
+    .modal-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      font-size: 28px;
+      color: #757575;
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
+    
+    /* Иконки */
+    .icon {
+      font-size: 20px;
+      margin-right: 8px;
+      vertical-align: middle;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="header-badge master" id="role-badge">👑 Мастер</div>
+    <div class="title">🌿 Фитосветильник</div>
+    <div class="time" id="clock">--:--</div>
+    <div class="phase-badge" id="phase-badge">🍃 Вегетация</div>
+  </div>
+  
+  <div class="tabs">
+    <div class="tab active" data-tab="main">🏠 Основное</div>
+    <div class="tab" data-tab="settings">⚙️ Настройки</div>
+    <div class="tab" data-tab="network">📡 Сеть</div>
+    <div class="tab" data-tab="group">👥 Группа</div>
+  </div>
+  
+  <!-- ОСНОВНОЙ ТАБ -->
+  <div class="tab-content active" id="tab-main">
+    <div class="card">
+      <div class="mode-switch">
+        <button class="mode-btn mode-auto" id="btn-auto">🔄 Авто</button>
+        <button class="mode-btn mode-manual" id="btn-manual">✋ Ручной</button>
+      </div>
+      <div class="status-bar">
+        <div class="status-fill" id="status-fill" style="width:50%">
+          <div class="status-label" id="status-label">День</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="card" id="phase-card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">🌱 Фазы роста</div>
+          <div class="card-subtitle">Научно обоснованные спектры</div>
+        </div>
+      </div>
+      <div class="phase-grid">
+        <button class="phase-btn phase-seed" data-phase="seedling">🌱<br>Прорастание</button>
+        <button class="phase-btn phase-veg" data-phase="vegetation">🍃<br>Вегетация</button>
+        <button class="phase-btn phase-flow" data-phase="flowering">🌸<br>Цветение</button>
+        <button class="phase-btn phase-fru" data-phase="fruiting">🍅<br>Созревание</button>
+      </div>
+    </div>
+    
+    <div class="card" id="manual-card" style="display:none">
+      <div class="card-header">
+        <div>
+          <div class="card-title">🎛️ Ручное управление</div>
+          <div class="card-subtitle">Настройка яркости каналов</div>
+        </div>
+      </div>
+      
+      <div class="slider-group">
+        <div class="slider-label">
+          <span>🔴 Красный (660нм)</span>
+          <span class="slider-value" id="red-val">0</span>
+        </div>
+        <input type="range" class="slider" min="0" max="255" value="0" id="red">
+      </div>
+      
+      <div class="slider-group">
+        <div class="slider-label">
+          <span>🔵 Синий (450нм)</span>
+          <span class="slider-value" id="blue-val">0</span>
+        </div>
+        <input type="range" class="slider" min="0" max="255" value="0" id="blue">
+      </div>
+      
+      <div class="slider-group">
+        <div class="slider-label">
+          <span>❄️ Хол. белый</span>
+          <span class="slider-value" id="cw-val">0</span>
+        </div>
+        <input type="range" class="slider" min="0" max="255" value="0" id="cw">
+      </div>
+      
+      <div class="slider-group">
+        <div class="slider-label">
+          <span>☀️ Тепл. белый</span>
+          <span class="slider-value" id="ww-val">0</span>
+        </div>
+        <input type="range" class="slider" min="0" max="255" value="0" id="ww">
+      </div>
+    </div>
+  </div>
+  
+  <!-- НАСТРОЙКИ ТАБ -->
+  <div class="tab-content" id="tab-settings">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">🔐 Безопасность</div>
+      </div>
+      
+      <div class="input-group">
+        <label class="input-label">Текущий пароль</label>
+        <input type="password" class="input-field" id="current-pass" placeholder="Введите текущий пароль">
+      </div>
+      
+      <div class="input-group">
+        <label class="input-label">Новый пароль</label>
+        <input type="password" class="input-field" id="new-pass" placeholder="Введите новый пароль">
+      </div>
+      
+      <div class="input-group">
+        <label class="input-label">Подтвердите пароль</label>
+        <input type="password" class="input-field" id="confirm-pass" placeholder="Повторите пароль">
+      </div>
+      
+      <button class="btn btn-primary" id="btn-change-pass">💾 Сохранить пароль</button>
+    </div>
+    
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">🎛️ Дополнительно</div>
+      </div>
+      
+      <div class="switch-container">
+        <div class="switch-label">Авто-перезагрузка при потере связи</div>
+        <label class="switch">
+          <input type="checkbox" id="auto-reboot" checked>
+          <span class="slider-switch"></span>
+        </label>
+      </div>
+      
+      <div class="switch-container">
+        <div class="switch-label">Звуковые уведомления</div>
+        <label class="switch">
+          <input type="checkbox" id="sound-notif">
+          <span class="slider-switch"></span>
+        </label>
+      </div>
+      
+      <button class="btn btn-warning" id="btn-factory-reset">⚠️ Сброс к заводским</button>
+    </div>
+  </div>
+  
+  <!-- СЕТЬ ТАБ -->
+  <div class="tab-content" id="tab-network">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">📶 WiFi подключение</div>
+        <div class="card-subtitle">Текущая сеть: <strong>POTAPOVO</strong></div>
+      </div>
+      
+      <div class="input-group">
+        <label class="input-label">Название сети (SSID)</label>
+        <input type="text" class="input-field" id="wifi-ssid" value="POTAPOVO" placeholder="Введите SSID">
+      </div>
+      
+      <div class="input-group">
+        <label class="input-label">Пароль сети</label>
+        <input type="password" class="input-field" id="wifi-pass" placeholder="Введите пароль">
+      </div>
+      
+      <button class="btn btn-primary" id="btn-connect-wifi">🔗 Подключиться</button>
+      
+      <button class="btn btn-outline" id="btn-scan-wifi" style="margin-top:6px">🔍 Сканировать сети</button>
+    </div>
+    
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">🌐 IP адрес</div>
+        <div class="card-subtitle">Текущий адрес: <strong>192.168.31.117</strong></div>
+      </div>
+      
+      <div class="input-group">
+        <label class="input-label">Статический IP (опционально)</label>
+        <input type="text" class="input-field" id="static-ip" placeholder="192.168.31.117">
+      </div>
+      
+      <div class="input-group">
+        <label class="input-label">Шлюз</label>
+        <input type="text" class="input-field" id="gateway" placeholder="192.168.31.1">
+      </div>
+      
+      <button class="btn btn-primary" id="btn-set-ip">💾 Сохранить настройки</button>
+    </div>
+  </div>
+  
+  <!-- ГРУППА ТАБ -->
+  <div class="tab-content" id="tab-group">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">👑 Режим устройства</div>
+      </div>
+      
+      <div class="mode-switch">
+        <button class="mode-btn mode-master" id="btn-master">👑 Мастер</button>
+        <button class="mode-btn mode-slave" id="btn-slave">🤖 Слейв</button>
+      </div>
+      
+      <div class="card-subtitle" style="margin-top:12px;text-align:center">
+        Мастер управляет группой, слейвы следуют за ним
+      </div>
+    </div>
+    
+    <div class="card" id="master-section">
+      <div class="card-header">
+        <div class="card-title">👥 Устройства в группе</div>
+        <div class="card-subtitle">Найдено: <strong id="device-count">3</strong> устройства</div>
+      </div>
+      
+      <div class="device-list">
+        <div class="device-item">
+          <div class="device-color" style="background:#4caf50"></div>
+          <div class="device-info">
+            <div class="device-name">Фитосветильник 1</div>
+            <div class="device-ip">192.168.31.117</div>
+          </div>
+          <div class="device-badge">👑 Мастер</div>
+        </div>
+        <div class="device-item">
+          <div class="device-color" style="background:#2196f3"></div>
+          <div class="device-info">
+            <div class="device-name">Фитосветильник 2</div>
+            <div class="device-ip">192.168.31.118</div>
+          </div>
+          <div class="device-badge slave">🤖 Слейв</div>
+        </div>
+        <div class="device-item">
+          <div class="device-color" style="background:#ff9800"></div>
+          <div class="device-info">
+            <div class="device-name">Фитосветильник 3</div>
+            <div class="device-ip">192.168.31.119</div>
+          </div>
+          <div class="device-badge slave">🤖 Слейв</div>
+        </div>
+      </div>
+      
+      <button class="btn btn-primary" id="btn-sync-all">🔄 Синхронизировать все</button>
+    </div>
+    
+    <div class="card" id="slave-section" style="display:none">
+      <div class="card-header">
+        <div class="card-title">🔗 Подключение к мастеру</div>
+      </div>
+      
+      <div class="input-group">
+        <label class="input-label">IP адрес мастера</label>
+        <input type="text" class="input-field" id="master-ip" value="192.168.31.117" placeholder="192.168.31.117">
+      </div>
+      
+      <div class="switch-container">
+        <div class="switch-label">Автоматическое обнаружение</div>
+        <label class="switch">
+          <input type="checkbox" id="auto-discover" checked>
+          <span class="slider-switch"></span>
+        </label>
+      </div>
+      
+      <button class="btn btn-primary" id="btn-connect-master">🔌 Подключиться к мастеру</button>
+      
+      <div class="card-subtitle" style="margin-top:16px;text-align:center;color:#4caf50">
+        ✅ Подключено к мастеру 192.168.31.117
+      </div>
+    </div>
+  </div>
+
+  <div class="feedback" id="feedback">✅ Готово</div>
+
+  <!-- Модальное окно сканирования сетей -->
+  <div class="modal" id="modal-scan">
+    <div class="modal-content">
+      <button class="modal-close" id="close-scan">&times;</button>
+      <div class="modal-header">
+        <div class="modal-title">📶 Доступные сети</div>
+      </div>
+      <div class="modal-body">
+        <div class="empty-state">
+          <div class="empty-icon">🔄</div>
+          <div>Сканирование сетей...</div>
+          <div style="font-size:13px;color:#757575;margin-top:8px">Это займёт 5-10 секунд</div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" id="cancel-scan">Отмена</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ===== ЭМУЛЯЦИЯ ДАННЫХ =====
+    const mockData = {
+      time: "12:00",
+      phase: "vegetation",
+      phase_label: "🍃 Вегетация",
+      auto: true,
+      red: 150,
+      blue: 200,
+      cw: 100,
+      ww: 20,
+      role: "master", // master или slave
+      password: "admin123",
+      wifi: {
+        ssid: "POTAPOVO",
+        ip: "192.168.31.117",
+        gateway: "192.168.31.1"
+      },
+      group: {
+        devices: [
+          { name: "Фитосветильник 1", ip: "192.168.31.117", role: "master" },
+          { name: "Фитосветильник 2", ip: "192.168.31.118", role: "slave" },
+          { name: "Фитосветильник 3", ip: "192.168.31.119", role: "slave" }
+        ]
+      },
+      settings: {
+        autoReboot: true,
+        soundNotif: false
+      }
+    };
+    
+    const phaseConfigs = {
+      seedling: {
+        label: "🌱 Прорастание",
+        color: "#9c27b0",
+        red: 180,
+        blue: 220,
+        cw: 30,
+        ww: 0,
+        desc: "Синий доминирует — стимуляция корней"
+      },
+      vegetation: {
+        label: "🍃 Вегетация",
+        color: "#4caf50",
+        red: 150,
+        blue: 200,
+        cw: 100,
+        ww: 20,
+        desc: "Синий > красный — рост зелёной массы"
+      },
+      flowering: {
+        label: "🌸 Цветение",
+        color: "#ff9800",
+        red: 230,
+        blue: 70,
+        cw: 40,
+        ww: 180,
+        desc: "Красный + тёплый — триггер цветения"
+      },
+      fruiting: {
+        label: "🍅 Созревание",
+        color: "#f44336",
+        red: 240,
+        blue: 40,
+        cw: 20,
+        ww: 200,
+        desc: "Максимум красного — накопление сахаров"
+      }
+    };
+    
+    // ===== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ =====
+    function showFeedback(text, duration = 1200) {
+      const el = document.getElementById('feedback');
+      el.textContent = text;
+      el.classList.add('show');
+      setTimeout(() => el.classList.remove('show'), duration);
+    }
+    
+    function logDebug(msg) {
+      const now = new Date();
+      const timeStr = now.toLocaleTimeString('ru-RU');
+      console.log(`[${timeStr}] ${msg}`);
+    }
+    
+    function updateClock() {
+      const now = new Date();
+      const hours = String(now.getHours()).padStart(2, '0');
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      
+      mockData.time = `${hours}:${minutes}`;
+      document.getElementById('clock').textContent = mockData.time;
+      
+      // Обновление индикатора дня/ночи
+      const hour = now.getHours();
+      let fill = 0;
+      let label = "Ночь";
+      
+      if (hour >= 6 && hour < 22) {
+        fill = 100;
+        label = "☀️ День";
+      } else if (hour >= 5 && hour < 6) {
+        fill = (hour - 5) * 100;
+        label = "🌅 Рассвет";
+      } else if (hour >= 22 && hour < 23) {
+        fill = (23 - hour) * 100;
+        label = "🌇 Закат";
+      }
+      
+      document.getElementById('status-fill').style.width = fill + '%';
+      document.getElementById('status-label').innerHTML = label;
+    }
+    
+    function updateUI() {
+      // Обновление бейджа фазы
+      document.getElementById('phase-badge').textContent = mockData.phase_label;
+      
+      // Обновление активной фазы
+      document.querySelectorAll('.phase-btn').forEach(btn => {
+        const isActive = btn.dataset.phase === mockData.phase;
+        btn.classList.toggle('phase-active', isActive);
+      });
+      
+      // Обновление режима
+      document.getElementById('btn-auto').classList.toggle('mode-active', mockData.auto);
+      document.getElementById('btn-manual').classList.toggle('mode-active', !mockData.auto);
+      document.getElementById('phase-card').style.display = mockData.auto ? 'block' : 'none';
+      document.getElementById('manual-card').style.display = mockData.auto ? 'none' : 'block';
+      
+      // Обновление слайдеров
+      if (!mockData.auto) {
+        ['red', 'blue', 'cw', 'ww'].forEach(ch => {
+          const val = mockData[ch] || 0;
+          document.getElementById(ch).value = val;
+          document.getElementById(ch + '-val').textContent = val;
+        });
+      }
+      
+      // Обновление режима мастер/слейв
+      document.getElementById('role-badge').textContent = mockData.role === 'master' ? '👑 Мастер' : '🤖 Слейв';
+      document.getElementById('role-badge').className = `header-badge ${mockData.role}`;
+      
+      // Обновление секций группировки
+      document.getElementById('master-section').style.display = mockData.role === 'master' ? 'block' : 'none';
+      document.getElementById('slave-section').style.display = mockData.role === 'slave' ? 'block' : 'none';
+      
+      // Обновление кнопок мастер/слейв
+      document.getElementById('btn-master').classList.toggle('mode-active', mockData.role === 'master');
+      document.getElementById('btn-slave').classList.toggle('mode-active', mockData.role === 'slave');
+      
+      // Обновление количества устройств
+      document.getElementById('device-count').textContent = mockData.group.devices.length;
+    }
+    
+    // ===== ОБРАБОТЧИКИ СОБЫТИЙ =====
+    // Табы
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        // Убираем активный класс со всех табов и контентов
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        
+        // Добавляем активный класс текущему табу и контенту
+        tab.classList.add('active');
+        const tabName = tab.dataset.tab;
+        document.getElementById(`tab-${tabName}`).classList.add('active');
+        
+        logDebug(`탭 переключён: ${tabName}`);
+      });
+    });
+    
+    // Переключение режимов
+    document.getElementById('btn-auto').addEventListener('click', () => {
+      if (!mockData.auto) {
+        mockData.auto = true;
+        logDebug('🔄 Автоматический режим включён');
+        showFeedback('🔄 Авто-режим активен', 1000);
+        updateUI();
+      }
+    });
+    
+    document.getElementById('btn-manual').addEventListener('click', () => {
+      if (mockData.auto) {
+        mockData.auto = false;
+        logDebug('✋ Ручной режим включён');
+        showFeedback('✋ Ручной режим активен', 1000);
+        updateUI();
+      }
+    });
+    
+    // Смена фазы
+    document.querySelectorAll('.phase-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const phase = btn.dataset.phase;
+        
+        if (phaseConfigs[phase]) {
+          const config = phaseConfigs[phase];
+          mockData.phase = phase;
+          mockData.phase_label = config.label;
+          mockData.red = config.red;
+          mockData.blue = config.blue;
+          mockData.cw = config.cw;
+          mockData.ww = config.ww;
+          
+          logDebug(`🔄 Фаза: ${config.label}`);
+          showFeedback(config.label, 1200);
+          updateUI();
+          
+          // Вибрация на телефоне
+          if (navigator.vibrate) {
+            navigator.vibrate(50);
+          }
+        }
+      });
+    });
+    
+    // Слайдеры
+    ['red', 'blue', 'cw', 'ww'].forEach(ch => {
+      const slider = document.getElementById(ch);
+      const valueEl = document.getElementById(ch + '-val');
+      
+      slider.addEventListener('input', () => {
+        const val = parseInt(slider.value);
+        mockData[ch] = val;
+        valueEl.textContent = val;
+      });
+      
+      slider.addEventListener('change', () => {
+        const val = parseInt(slider.value);
+        logDebug(`🎛️ ${ch.toUpperCase()}: ${val}`);
+        showFeedback(`${ch === 'red' ? '🔴' : ch === 'blue' ? '🔵' : ch === 'cw' ? '❄️' : '☀️'} ${val}`, 600);
+      });
+    });
+    
+    // Режим мастер/слейв
+    document.getElementById('btn-master').addEventListener('click', () => {
+      if (mockData.role !== 'master') {
+        mockData.role = 'master';
+        logDebug('👑 Режим: Мастер');
+        showFeedback('👑 Режим мастера активен', 1200);
+        updateUI();
+      }
+    });
+    
+    document.getElementById('btn-slave').addEventListener('click', () => {
+      if (mockData.role !== 'slave') {
+        mockData.role = 'slave';
+        logDebug('🤖 Режим: Слейв');
+        showFeedback('🤖 Режим слейва активен', 1200);
+        updateUI();
+      }
+    });
+    
+    // Смена пароля
+    document.getElementById('btn-change-pass').addEventListener('click', () => {
+      const current = document.getElementById('current-pass').value;
+      const nw = document.getElementById('new-pass').value;
+      const confirm = document.getElementById('confirm-pass').value;
+      
+      if (current !== mockData.password) {
+        showFeedback('❌ Неверный текущий пароль', 1500);
+        return;
+      }
+      
+      if (nw.length < 6) {
+        showFeedback('⚠️ Пароль минимум 6 символов', 1500);
+        return;
+      }
+      
+      if (nw !== confirm) {
+        showFeedback('❌ Пароли не совпадают', 1500);
+        return;
+      }
+      
+      mockData.password = nw;
+      showFeedback('✅ Пароль изменён', 1500);
+      logDebug(`🔐 Пароль изменён`);
+      
+      // Очищаем поля
+      document.getElementById('current-pass').value = '';
+      document.getElementById('new-pass').value = '';
+      document.getElementById('confirm-pass').value = '';
+    });
+    
+    // Подключение к WiFi
+    document.getElementById('btn-connect-wifi').addEventListener('click', () => {
+      const ssid = document.getElementById('wifi-ssid').value.trim();
+      const pass = document.getElementById('wifi-pass').value.trim();
+      
+      if (!ssid) {
+        showFeedback('⚠️ Введите SSID сети', 1500);
+        return;
+      }
+      
+      if (pass.length < 8) {
+        showFeedback('⚠️ Пароль минимум 8 символов', 1500);
+        return;
+      }
+      
+      // Эмуляция подключения
+      showFeedback('🔄 Подключение...', 800);
+      setTimeout(() => {
+        mockData.wifi.ssid = ssid;
+        showFeedback(`✅ Подключено к ${ssid}`, 1500);
+        logDebug(`📶 Подключено к WiFi: ${ssid}`);
+      }, 1200);
+    });
+    
+    // Сканирование сетей
+    document.getElementById('btn-scan-wifi').addEventListener('click', () => {
+      document.getElementById('modal-scan').classList.add('active');
+      
+      // Эмуляция сканирования
+      setTimeout(() => {
+        const modalBody = document.querySelector('#modal-scan .modal-body');
+        modalBody.innerHTML = `
+          <div class="device-list">
+            <div class="device-item" data-ssid="POTAPOVO">
+              <div class="device-color" style="background:#4caf50;width:12px;height:12px"></div>
+              <div class="device-info">
+                <div class="device-name">POTAPOVO</div>
+                <div class="device-ip">Отличный сигнал • 2.4 GHz</div>
+              </div>
+            </div>
+            <div class="device-item" data-ssid="MegaFon Home">
+              <div class="device-color" style="background:#2196f3;width:12px;height:12px"></div>
+              <div class="device-info">
+                <div class="device-name">MegaFon Home</div>
+                <div class="device-ip">Хороший сигнал • 2.4 GHz</div>
+              </div>
+            </div>
+            <div class="device-item" data-ssid="TP-Link_5G">
+              <div class="device-color" style="background:#ff9800;width:12px;height:12px"></div>
+              <div class="device-info">
+                <div class="device-name">TP-Link_5G</div>
+                <div class="device-ip">Слабый сигнал • 5 GHz</div>
+              </div>
+            </div>
+          </div>
+        `;
+        
+        // Обработчик выбора сети
+        document.querySelectorAll('#modal-scan .device-item').forEach(item => {
+          item.addEventListener('click', () => {
+            const ssid = item.dataset.ssid;
+            document.getElementById('wifi-ssid').value = ssid;
+            document.getElementById('modal-scan').classList.remove('active');
+            showFeedback(`📶 Выбрана сеть: ${ssid}`, 1000);
+          });
+        });
+      }, 1500);
+    });
+    
+    // Закрытие модалки
+    document.getElementById('close-scan').addEventListener('click', () => {
+      document.getElementById('modal-scan').classList.remove('active');
+    });
+    
+    document.getElementById('cancel-scan').addEventListener('click', () => {
+      document.getElementById('modal-scan').classList.remove('active');
+    });
+    
+    // Синхронизация группы
+    document.getElementById('btn-sync-all').addEventListener('click', () => {
+      showFeedback('🔄 Синхронизация группы...', 800);
+      setTimeout(() => {
+        showFeedback('✅ Все устройства синхронизированы', 1500);
+        logDebug('🔄 Группа синхронизирована');
+      }, 1000);
+    });
+    
+    // Подключение к мастеру
+    document.getElementById('btn-connect-master').addEventListener('click', () => {
+      const ip = document.getElementById('master-ip').value.trim();
+      
+      if (!ip.match(/^\d{1,3}(\.\d{1,3}){3}$/)) {
+        showFeedback('⚠️ Неверный формат IP', 1500);
+        return;
+      }
+      
+      showFeedback(`🔌 Подключение к ${ip}...`, 1000);
+      setTimeout(() => {
+        showFeedback(`✅ Подключено к мастеру ${ip}`, 1500);
+        logDebug(`🔗 Подключено к мастеру: ${ip}`);
+      }, 1200);
+    });
+    
+    // Сброс к заводским
+    document.getElementById('btn-factory-reset').addEventListener('click', () => {
+      if (confirm('⚠️ Внимание!\nВсе настройки будут сброшены к заводским.\nПродолжить?')) {
+        // Эмуляция сброса
+        showFeedback('⚠️ Сброс настроек...', 1000);
+        setTimeout(() => {
+          showFeedback('✅ Сброс выполнен', 1500);
+          logDebug('⚠️ Заводской сброс выполнен');
+        }, 1200);
+      }
+    });
+    
+    // Переключатели
+    document.getElementById('auto-reboot').addEventListener('change', function() {
+      mockData.settings.autoReboot = this.checked;
+      showFeedback(this.checked ? '✅ Авто-перезагрузка включена' : '📴 Авто-перезагрузка выключена', 1000);
+    });
+    
+    document.getElementById('sound-notif').addEventListener('change', function() {
+      mockData.settings.soundNotif = this.checked;
+      showFeedback(this.checked ? '🔊 Звук включён' : '🔇 Звук выключен', 1000);
+    });
+    
+    document.getElementById('auto-discover').addEventListener('change', function() {
+      showFeedback(this.checked ? '✅ Авто-обнаружение включено' : '📴 Авто-обнаружение выключено', 1000);
+    });
+    
+    // ===== ИНИЦИАЛИЗАЦИЯ =====
+    // Обновление времени каждую секунду
+    setInterval(updateClock, 1000);
+    
+    // Автообновление интерфейса
+    setInterval(updateUI, 500);
+    
+    // Инициализация
+    logDebug('📱 Демо-интерфейс запущен');
+    logDebug('💡 Тестируйте все функции интерфейса');
+    
+    // Первоначальное обновление
+    updateClock();
+    updateUI();
+    
+    // Запрет выделения текста при свайпах
+    document.addEventListener('touchmove', (e) => {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+        e.stopPropagation();
+      }
+    }, { passive: false });
+  </script>
+</body>
+</html>
